@@ -3,521 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTS Pemrograman Mobile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Ujian Akhir Semester - Flutter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary-color: #4f46e5; /* Indigo modern */
-            --primary-hover: #4338ca;
-            --bg-dark: #111827;
-            --bg-sidebar: #1f2937;
-            --text-light: #f3f4f6;
-            --text-gray: #9ca3af;
-            --danger: #ef4444;
+            --bg-body: #0f172a;
+            --bg-panel: #1e293b;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #06b6d4;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
             --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --border: rgba(255,255,255,0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main);
             height: 100vh; 
             overflow: hidden; 
-            background: var(--bg-dark); 
         }
 
-        /* --- ANIMASI --- */
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+        /* UTILS */
+        .hidden { display: none !important; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- OVERLAY LOGIN MODERN --- */
-        #overlay { 
-            position: fixed; 
-            top:0; 
-            left:0; 
-            width:100%; 
-            height:100%; 
-            /* Latar belakang gradien animasi */
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        /* --- BACKGROUND ANIMATION --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            z-index: 99; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            flex-direction: column;
-            padding: 20px;
+            animation: gradientFlow 15s ease infinite;
+            z-index: 100;
         }
+        @keyframes gradientFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .login-card { 
-            /* Efek Glassmorphism */
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; 
-            padding: 30px 20px; 
-            border-radius: 20px; 
-            width: 100%;
-            max-width: 350px;
-            text-align: center; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .login-card h2 { 
-            font-weight: 700; 
-            letter-spacing: 1px; 
-            margin-bottom: 20px; 
-            font-size: 1.5rem;
-        }
-
-        .status-box {
-            background: rgba(0, 0, 0, 0.2); 
-            padding: 15px; 
-            border-radius: 10px;
-            margin-bottom: 25px; 
-            font-size: 0.9em; 
+        /* --- LOGIN CARD --- */
+        .login-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px; border-radius: 24px;
+            width: 380px; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-title { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        .login-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+
+        /* --- SCHEDULE INFO BOX (NEW FITUR) --- */
+        .schedule-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
             text-align: left;
         }
-        .status-box strong { color: var(--text-light); }
 
-        input.login-input { 
-            width: 100%; 
-            padding: 15px; 
-            margin: 10px 0 20px 0; 
-            border: 2px solid rgba(255,255,255,0.1); 
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px; 
-            color: white; 
-            font-size: 16px;
-            transition: 0.3s;
-            text-align: center; 
-            font-weight: 600; 
-            letter-spacing: 2px;
+        .schedule-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 8px; color: var(--text-main); font-size: 14px;
         }
-        input.login-input:focus { 
-            outline: none; 
-            border-color: var(--primary-color); 
-            background: rgba(255,255,255,0.1); 
-        }
-        input.login-input::placeholder { 
-            color: rgba(255,255,255,0.5); 
-            font-weight: 400; 
-            letter-spacing: 0; 
-        }
+        .schedule-row svg { color: var(--text-muted); }
         
-        .btn-grad { 
-            width: 100%; 
-            padding: 15px; 
-            background-image: linear-gradient(to right, var(--primary-color) 0%, #3b82f6 51%, var(--primary-color) 100%);
-            background-size: 200% auto;
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            font-size: 16px;
-            transition: 0.5s; 
+        .status-badge {
+            display: block; text-align: center; margin-top: 12px;
+            padding: 8px; border-radius: 8px; font-weight: 600; font-size: 13px;
+            letter-spacing: 0.5px; text-transform: uppercase;
         }
-        .btn-grad:hover { 
-            background-position: right center; 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 20px -10px rgba(79, 70, 229, 0.5);
+
+        /* Status Colors */
+        .st-loading { background: rgba(255,255,255,0.1); color: var(--text-muted); border: 1px solid var(--border); }
+        .st-wait { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .st-live { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); animation: pulseGreen 2s infinite; }
+        .st-end { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* --- INPUT & BUTTONS --- */
+        .input-group input {
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+            border-radius: 12px; color: white; font-size: 16px; text-align: center;
+            font-family: 'JetBrains Mono', monospace; transition: 0.3s;
         }
-        .btn-grad:disabled { 
-            background: #4b5563; 
-            cursor: not-allowed; 
-            transform: none; 
-            box-shadow: none; 
-            color: #9ca3af; 
+        .input-group input:focus { outline: none; border-color: var(--primary); background: rgba(99, 102, 241, 0.1); }
+
+        .btn-primary {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white; font-weight: 600; border: none; border-radius: 12px;
+            cursor: pointer; font-size: 15px; transition: 0.3s;
         }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
+        .btn-primary:disabled { background: #334155; color: #64748b; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- DASHBOARD LAYOUT --- */
+        .app-layout { display: flex; height: 100vh; }
         
-        /* --- APLIKASI UTAMA (TEMA GELAP) --- */
-        .app-container { 
-            display: flex; 
-            flex-direction: column;
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg-dark); 
+        .sidebar {
+            width: 450px; background: var(--bg-panel); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; z-index: 10;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.3);
         }
-        
-        .sidebar { 
-            width: 100%; 
-            background: var(--bg-sidebar); 
-            color: var(--text-light);
-            border-right: 1px solid rgba(255,255,255,0.05); 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2); 
-            z-index: 10;
-            overflow-y: auto;
-            max-height: 50vh;
-        }
-        
-        .header-top { 
-            display: flex; 
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px; 
-            padding-bottom: 15px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-        }
-        .student-info { 
-            font-size: 0.9em; 
-            color: var(--text-gray); 
-        }
-        .student-info strong { 
-            color: var(--text-light); 
-            display: block; 
-            font-size: 1.1em; 
-        }
-        
-        .timer-display { 
-            font-size: 24px; 
-            font-family: 'Courier New', monospace; 
-            font-weight: 700; 
-            color: var(--text-light); 
-            background: rgba(0,0,0,0.3);
-            padding: 10px 15px; 
-            border-radius: 8px; 
-            border: 1px solid var(--danger);
-            text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+
+        .sidebar-header { padding: 25px; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); }
+        .user-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .user-name { font-size: 18px; font-weight: 700; color: white; margin-bottom: 15px; }
+
+        .timer-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--error);
+            color: var(--error); padding: 10px; border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700;
             text-align: center;
         }
 
-        /* Detail Soal Profesional */
-        .soal-container { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding-right: 10px; 
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 25px; }
+        
+        .card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 20px;
         }
-        .soal-title { 
-            font-size: 1.1em; 
-            font-weight: 600; 
-            margin-bottom: 15px; 
-            color: var(--primary-color); 
-        }
-        .soal-box { 
-            background: rgba(255,255,255,0.05); 
-            padding: 15px; 
-            border-radius: 12px; 
-            border-left: 4px solid var(--primary-color); 
-            font-size: 0.9em; 
-            line-height: 1.6; 
-            color: #d1d5db;
-        }
-        .soal-box h4 { 
-            color: var(--text-light); 
-            margin-bottom: 10px; 
-            font-size: 1em;
-        }
-        .soal-box ul { 
-            padding-left: 20px; 
-            margin-bottom: 15px; 
-        }
-        .soal-box li { 
-            margin-bottom: 8px; 
-        }
-        /* Highlight kode dalam soal */
-        code { 
-            background: rgba(0,0,0,0.3); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            color: #f472b6; 
-            font-family: monospace; 
-            font-size: 0.85em;
-        }
+        .card h3 { font-size: 15px; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        
+        .instruction-list { padding-left: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+        .instruction-list li { margin-bottom: 8px; }
+        code { background: rgba(0,0,0,0.3); color: #f472b6; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 
-        .submission-area { 
-            margin-top: 20px; 
+        .submit-section { padding: 25px; background: rgba(15, 23, 42, 0.5); border-top: 1px solid var(--border); }
+        
+        textarea.code-area {
+            width: 100%; height: 120px; background: #0f172a; border: 1px solid var(--border);
+            border-radius: 8px; padding: 15px; color: #e2e8f0; font-family: 'JetBrains Mono', monospace;
+            font-size: 12px; resize: none; margin-bottom: 15px;
         }
-        textarea#code { 
-            width: 100%; 
-            height: 120px; 
-            padding: 15px; 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-light); 
-            font-family: monospace; 
-            border-radius: 10px;
-            resize: vertical; 
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        textarea#code:focus { 
-            outline: none; 
-            border-color: var(--primary-color); 
-        }
+        textarea.code-area:focus { outline: none; border-color: var(--primary); }
 
-        .main-panel { 
-            flex: 1; 
-            background: #000; 
-            position: relative; 
-            height: 50vh;
-        }
-        iframe { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-        }
-
-        /* Media Queries untuk tampilan desktop */
-        @media (min-width: 768px) {
-            .app-container { 
-                flex-direction: row; 
-            }
-            
-            .sidebar { 
-                width: 38%; 
-                max-height: 100vh;
-            }
-            
-            .header-top { 
-                flex-direction: row; 
-                justify-content: space-between; 
-                align-items: center; 
-            }
-            
-            .main-panel { 
-                height: 100vh;
-            }
-        }
+        .main-panel { flex: 1; background: black; }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <div class="login-card animate-fade-in-up">
-            <h2>🚀 UTS Pemrograman Mobile</h2>
-            
-            <div id="status-jadwal" class="status-box">
-                <span style="display: flex; align-items: center; gap: 10px;">
-                    <svg class="spin" style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg> 
-                    Menghubungkan ke Server...
-                </span>
+    <div id="login-screen" class="flex-center">
+        <div class="login-card">
+            <h1 class="login-title">Ujian Praktik Flutter</h1>
+            <p class="login-subtitle">Silakan login untuk memulai sesi</p>
+
+            <div class="schedule-box">
+                <div class="schedule-row">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5C3.89,4 3,4.9 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8Z"/></svg>
+                    <span id="info-date">Memuat Tanggal...</span>
+                </div>
+                <div class="schedule-row">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/></svg>
+                    <span id="info-time">Memuat Waktu...</span>
+                </div>
+                <div id="status-badge" class="status-badge st-loading">
+                    <svg class="spin" style="width:12px; height:12px; display:inline-block; vertical-align:middle" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg> 
+                    MENGHUBUNGKAN...
+                </div>
             </div>
 
-            <input type="text" id="nim" class="login-input" placeholder="MASUKKAN NIM" maxlength="15">
-            <button id="btn-login" class="btn-grad" onclick="login()" disabled>LOGIN SEKARANG</button>
-            <p id="debug-msg" style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:15px;">Pastikan koneksi internet stabil.</p>
+            <div class="input-group">
+                <input type="text" id="nim" placeholder="MASUKKAN NIM" maxlength="20" autocomplete="off">
+            </div>
+
+            <button id="btn-login" class="btn-primary" onclick="handleLogin()" disabled>
+                MASUK UJIAN
+            </button>
+            <p id="error-msg" style="color:var(--error); font-size:12px; margin-top:15px; min-height:18px;"></p>
         </div>
     </div>
 
-    <div class="app-container animate-fade-in-up" style="display:none;" id="main-app">
+    <div id="dashboard" class="app-layout hidden">
         <div class="sidebar">
-            <div class="header-top">
-                <div class="student-info">
-                    Peserta Ujian:
-                    <strong id="mhs-name-display">-</strong>
-                </div>
-                <div class="timer-display" id="timer">00:00:00</div>
+            <div class="sidebar-header">
+                <div class="user-label">Peserta Ujian</div>
+                <div class="user-name" id="display-name">-</div>
+                <div class="timer-box" id="timer">00:00:00</div>
             </div>
 
-            <div class="soal-container">
-                <div class="soal-title">📝 Spesifikasi Soal: Aplikasi Kalkulator</div>
-                <div class="soal-box">
-                    <h4>Deskripsi Tugas</h4>
-                    <p>Anda diminta mengembangkan aplikasi Flutter satu halaman (Single Page) yang berfungsi sebagai kalkulator penjumlahan sederhana antara dua angka.</p>
-                    <br>
-                    <h4>Kriteria Teknis Wajib (Rubrik Penilaian)</h4>
-                    <ul>
-                        <li>
-                            <strong>Widget Input (Bobot 50%):</strong><br>
-                             Gunakan 2 buah widget <code>TextField</code> untuk menerima input angka dari pengguna. Pastikan keduanya terhubung dengan <code>TextEditingController</code>.
-                        </li>
-                        <li>
-                            <strong>Widget Kontrol (Bobot 25%):</strong><br>
-                            Gunakan 1 buah widget tombol (contoh: <code>ElevatedButton</code>) untuk memicu perhitungan.
-                        </li>
-                        <li>
-                            <strong>Logika & State (Bobot 25%):</strong><br>
-                            Saat tombol ditekan, aplikasi harus melakukan parsing input string menjadi angka (<code>double.parse</code> atau <code>int.parse</code>), menjumlahkannya, dan memperbarui tampilan hasil menggunakan <code>setState()</code>.
-                        </li>
+            <div class="sidebar-content">
+                <div class="card">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14,17H7V15H14M17,13H7V11H17M17,9H7V7H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.11,3 19,3Z"/></svg>
+                        Instruksi Soal
+                    </h3>
+                    <ul class="instruction-list">
+                        <li>Buat aplikasi <strong>Kalkulator Penjumlahan</strong>.</li>
+                        <li>Wajib: <strong>2 TextField</strong> (Input Angka).</li>
+                        <li>Wajib: <strong>1 ElevatedButton</strong> (Tombol Hitung).</li>
+                        <li>Wajib: Tampilkan hasil dengan <strong>setState</strong>.</li>
+                        <li>Wajib: Gunakan <strong>double.tryParse</strong> untuk validasi.</li>
                     </ul>
-                    <p style="font-size: 0.9em; opacity: 0.8;"><em>Catatan: Gunakan DartPad di sebelah kanan untuk implementasi. UI harus muncul dan berfungsi.</em></p>
+                </div>
+
+                <div class="card" style="border-color: rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.05);">
+                    <h3>Cara Mengumpulkan</h3>
+                    <p style="font-size:13px; color: var(--text-muted);">
+                        Salin semua kode dari DartPad (Kanan), lalu tempel di bawah ini:
+                    </p>
                 </div>
             </div>
 
-            <div class="submission-area">
-                <p style="margin-bottom: 10px; font-weight: 600;">Pengumpulan Jawaban:</p>
-                <textarea id="code" placeholder="// Salin SEMUA kode dari DartPad di kanan, lalu tempel di sini..."></textarea>
-                <button class="btn-grad" onclick="submitExam()">KIRIM JAWABAN FINAL</button>
+            <div class="submit-section">
+                <textarea id="code-submit" class="code-area" placeholder="// Paste kode DartPad di sini..."></textarea>
+                <button id="btn-submit" class="btn-primary" onclick="handleSubmit()">
+                    KIRIM JAWABAN FINAL
+                </button>
             </div>
         </div>
+
         <div class="main-panel">
-            <iframe src="https://dartpad.dev/embed-flutter.html?theme=dark&run=true&split=55"></iframe>
+            <iframe src="https://dartpad.dev/embed-flutter.html?theme=dark&run=true&split=60" title="DartPad Editor"></iframe>
         </div>
     </div>
 
 <script>
-    // ⚠️⚠️⚠️ PASTE URL APPS SCRIPT BARU BAPAK DI BAWAH INI ⚠️⚠️⚠️
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxz96jPZ_y2wd3xapsHM_2x3UAanhX-9GjeEiX7NayXKwWbr1OIftGiCIaKGP7KqldB/exec"; 
+    // ==========================================
+    // ⚙️ KONFIGURASI (EDIT URL INI)
+    // ==========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbzVLM6CDncg-AYLrFpqEoPAUqkYBmQjvPnBHoXgXuA83sldcKeyQaPaF41gkytlUTud/exec"; 
 
-    let studentName = "";
+    // Variabel Global
+    let userData = { nama: "", nim: "" };
     let examEndTime = null;
 
-    // --- CSS Spinner Animation ---
-    const style = document.createElement('style');
-    style.innerHTML = `.spin { animation: spin 1s linear infinite; } @keyframes spin { 100% { transform: rotate(360deg); } }`;
-    document.head.appendChild(style);
-
-    // FUNGSI FETCH ROBUST
-    async function kirimKeServer(dataPayload) {
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: "POST", 
-                body: JSON.stringify(dataPayload)
-            });
-            if (!response.ok) throw new Error("Server Error");
-            return await response.json();
-        } catch (error) {
-            console.error(error);
-            document.getElementById("debug-msg").innerText = "Error Koneksi. Coba refresh.";
-            return null;
-        }
-    }
-
-    // 1. ONLOAD: CEK JADWAL
-    window.onload = async function() {
-        if(SCRIPT_URL.includes("PASTE_URL")) return alert("URL Script belum disetting di HTML!");
+    // --- 1. INISIALISASI ---
+    window.onload = async () => {
+        if(API_URL.includes("PASTE_URL")) return alert("URL Script belum disetting!");
         
-        const data = await kirimKeServer({ action: "get_schedule" });
-        if (data) checkTime(data);
-        else document.getElementById("status-jadwal").innerHTML = "<span style='color:var(--danger)'>Gagal memuat jadwal. Refresh halaman.</span>";
-    }
+        const data = await fetchData({ action: "get_schedule" });
+        if(data) updateJadwalUI(data);
+        else document.getElementById("status-badge").innerText = "Koneksi Error";
+    };
 
-    // 2. CEK WAKTU
-    function checkTime(jadwal) {
-        const statusBox = document.getElementById("status-jadwal");
-        const btn = document.getElementById("btn-login");
+    // --- 2. LOGIKA JADWAL & STATUS UI ---
+    function updateJadwalUI(jadwal) {
         const now = new Date();
         const start = new Date(jadwal.tanggal.replace(/-/g, "/") + " " + jadwal.jam_mulai);
         const end = new Date(jadwal.tanggal.replace(/-/g, "/") + " " + jadwal.jam_selesai);
         examEndTime = end;
 
-        let infoStyle = "color: var(--text-light);";
-        let statusBadge = "";
+        // Update Teks Tanggal & Jam di Kotak Info
+        // Helper format tanggal Indonesia
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const tglIndo = new Date(jadwal.tanggal).toLocaleDateString('id-ID', options);
+        
+        document.getElementById("info-date").innerText = tglIndo;
+        document.getElementById("info-time").innerText = `${jadwal.jam_mulai} - ${jadwal.jam_selesai} WIB`;
+
+        // Update Badge Status & Tombol
+        const badge = document.getElementById("status-badge");
+        const btn = document.getElementById("btn-login");
+
+        badge.className = "status-badge"; // Reset class
 
         if (now < start) {
-            statusBadge = `<span style="color:var(--danger); font-weight:bold;">⛔ BELUM DIMULAI</span>`;
+            badge.classList.add("st-wait");
+            badge.innerHTML = "⛔ BELUM DIMULAI";
             btn.disabled = true; 
-            btn.innerText = "AKSES DITUTUP";
+            btn.innerText = "MENUNGGU WAKTU UJIAN";
         } else if (now > end) {
-            statusBadge = `<span style="color:var(--danger); font-weight:bold;">⛔ WAKTU HABIS</span>`;
+            badge.classList.add("st-end");
+            badge.innerHTML = "⛔ UJIAN BERAKHIR";
             btn.disabled = true; 
             btn.innerText = "AKSES DITUTUP";
         } else {
-            statusBadge = `<span style="color:var(--success); font-weight:bold;">✅ UJIAN BERLANGSUNG</span>`;
-            btn.disabled = false;
+            badge.classList.add("st-live");
+            badge.innerHTML = "✅ SEDANG BERLANGSUNG";
+            btn.disabled = false; 
+            btn.innerText = "MASUK UJIAN";
         }
-
-        statusBox.innerHTML = `
-            <div style="${infoStyle} margin-bottom:5px;">📅 Tanggal: <strong>${jadwal.tanggal}</strong></div>
-            <div style="${infoStyle} margin-bottom:10px;">⏰ Waktu: <strong>${jadwal.jam_mulai} - ${jadwal.jam_selesai}</strong></div>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1)">Status: ${statusBadge}</div>
-        `;
     }
 
-    // 3. LOGIN
-    async function login() {
+    // --- 3. LOGIN ---
+    async function handleLogin() {
         const nimInput = document.getElementById("nim");
         const nim = nimInput.value.trim();
         const btn = document.getElementById("btn-login");
-        
+        const err = document.getElementById("error-msg");
+
         if(!nim) {
-            nimInput.style.borderColor = "var(--danger)";
-            setTimeout(() => nimInput.style.borderColor = "rgba(255,255,255,0.1)", 2000);
+            nimInput.style.borderColor = "var(--error)";
+            setTimeout(()=> nimInput.style.borderColor = "var(--border)", 2000);
             return;
         }
 
-        btn.innerHTML = '<svg class="spin" style="width:20px;height:20px;margin-right:10px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg> MEMERIKSA NIM...';
         btn.disabled = true;
+        btn.innerHTML = `<svg class="spin" style="width:16px;height:16px;vertical-align:middle" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg> MEMERIKSA...`;
+        err.innerText = "";
 
-        const data = await kirimKeServer({ action: "login", nim: nim });
+        const res = await fetchData({ action: "login", nim: nim });
 
-        if (data && data.status == "ok") {
-            studentName = data.nama;
-            document.getElementById("mhs-name-display").innerText = studentName;
-            
-            // Transisi halus
-            document.getElementById("overlay").style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById("overlay").style.display = "none";
-                document.getElementById("main-app").style.display = "flex";
-            }, 500);
-            
-            runTimer();
+        if(res && res.status === "ok") {
+            userData = { nama: res.nama, nim: nim };
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            document.getElementById("display-name").innerText = userData.nama;
+            startCountdown();
         } else {
-            alert(data ? "NIM Tidak Terdaftar!" : "Gagal Login.");
-            btn.innerHTML = "LOGIN SEKARANG"; 
+            err.innerText = res ? "NIM Tidak Terdaftar" : "Gagal Koneksi";
             btn.disabled = false;
+            btn.innerText = "MASUK UJIAN";
         }
     }
 
-    // 4. TIMER
-    function runTimer() {
-        const timerDisplay = document.getElementById("timer");
+    // --- 4. TIMER ---
+    function startCountdown() {
+        const timerEl = document.getElementById("timer");
         setInterval(() => {
             const now = new Date();
-            const distance = examEndTime - now;
-            if(distance < 0) {
-                timerDisplay.innerText = "00:00:00";
-                timerDisplay.style.color = "var(--danger)";
-                alert("WAKTU HABIS! Jawaban dikirim otomatis.");
-                submitExam(); 
-                return;
+            const diff = examEndTime - now;
+
+            if(diff <= 0) {
+                timerEl.innerText = "00:00:00";
+                alert("WAKTU HABIS! Mengirim jawaban otomatis...");
+                handleSubmit(true); return;
             }
-            const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((distance % (1000 * 60)) / 1000);
-            timerDisplay.innerText = `${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
-            
-            // Efek 'Panic' jika waktu < 5 menit
-            if(distance < 300000) timerDisplay.style.animation = "pulse 1s infinite";
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+            timerEl.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
         }, 1000);
     }
 
-    // 5. SUBMIT
-    async function submitExam() {
-        const nim = document.getElementById("nim").value;
-        const code = document.getElementById("code").value;
-        
-        if(code.length < 50 && confirm("Kode jawaban terlihat sangat pendek atau kosong. Yakin kirim?") == false) return;
+    // --- 5. SUBMIT ---
+    async function handleSubmit(force = false) {
+        const code = document.getElementById("code-submit").value;
+        const btn = document.getElementById("btn-submit");
 
+        if(!force) {
+            if(code.length < 20) return alert("Kode jawaban terlalu pendek!");
+            if(!confirm("Yakin kirim jawaban final?")) return;
+        }
+
+        btn.disabled = true; btn.innerHTML = "MENGIRIM...";
+
+        // Autograde Lokal
         let score = 0;
         if(code.includes("TextField")) score += 25;
         if(code.includes("ElevatedButton")) score += 25;
         if(code.includes("setState")) score += 25;
         if(code.includes("parse") || code.includes("tryParse")) score += 25;
 
-        const btn = document.querySelector(".submission-area button");
-        btn.innerHTML = '<svg class="spin" style="width:20px;height:20px;margin-right:10px" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/></svg> MENGIRIM...';
-        btn.disabled = true;
+        const res = await fetchData({
+            action: "submit", nama: userData.nama, nim: userData.nim, nilai: score
+        });
 
-        const data = await kirimKeServer({ action: "submit", nama: studentName, nim: nim, nilai: score });
-        
-        if(data && data.result == "success") {
+        if(res && res.result === "success") {
             document.body.innerHTML = `
-                <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; background:var(--bg-dark); color:white; text-align:center;">
-                    <h1 style="font-size:3em; margin-bottom:20px;">🎉 Ujian Selesai</h1>
-                    <p style="font-size:1.2em; color:var(--text-gray);">Terima kasih, ${studentName}.<br>Jawaban Anda telah berhasil disimpan ke server.</p>
+                <div class="flex-center" style="height:100vh; flex-direction:column; text-align:center;">
+                    <h1 style="font-size:3em; margin-bottom:10px;">🎉</h1>
+                    <h2>Jawaban Terkirim</h2>
+                    <p style="color:var(--text-muted); margin-top:10px;">Terima kasih, ${userData.nama}.</p>
                 </div>`;
         } else {
-             btn.innerHTML = "KIRIM JAWABAN FINAL"; 
-             btn.disabled = false;
-             alert("Gagal mengirim. Coba lagi.");
+            alert("Gagal: " + (res ? res.msg : "Koneksi Error"));
+            btn.innerHTML = "KIRIM ULANG"; btn.disabled = false;
         }
+    }
+
+    async function fetchData(payload) {
+        try {
+            const req = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            return await req.json();
+        } catch (e) { return null; }
     }
 </script>
 </body>
 </html>
-
